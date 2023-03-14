@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { DogCard } from '../components';
-import { IDog, IDogSearchResults } from '../interfaces';
-import { getBreeds, getDogs, searchDogs } from '../middleware';
+import { IDog } from '../interfaces';
+import { getBreeds, loadDogsHelper } from '../middleware';
 
 interface IBrowsePageProps {}
 
@@ -23,12 +23,11 @@ export function Browse(props: IBrowsePageProps) {
 
     async function loadDogs() {
         try {
-            const searchResults: IDogSearchResults = await searchDogs(true);
-            const dogs = await getDogs(searchResults.resultIds);
+            const dogs = await loadDogsHelper();
             setDogs(dogs);
 
         } catch (err) {
-
+            console.log('caught error');
         }
     }
 

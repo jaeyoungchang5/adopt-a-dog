@@ -32,22 +32,20 @@ export function Login(props: ILoginPageProps) {
 	}
 
 	return (
-		<div>
-            <Form>
-                <Form.Group controlId="name">
-                    <Form.Label>Name</Form.Label>
-                    <Form.Control type='text' value={user.name} placeholder='Name' name='name' onChange={handleChange} autoComplete='off' />
-                </Form.Group>
+        <Form>
+            <Form.Group controlId="name">
+                <Form.Label>Name</Form.Label>
+                <Form.Control type='text' value={user.name} placeholder='Name' name='name' onChange={handleChange} autoComplete='off' />
+            </Form.Group>
 
-                <Form.Group controlId="email">
-                    <Form.Label>Email</Form.Label>
-                    <Form.Control type='Email' value={user.email} placeholder='Email' name='email' onChange={handleChange} autoComplete='off' />
-                </Form.Group>
-                
-                <Button onClick={handleSubmit} variant="primary" type="submit">
-                    Log In
-                </Button>
-            </Form>
-        </div>
+            <Form.Group controlId="email">
+                <Form.Label>Email</Form.Label>
+                <Form.Control type='Email' value={user.email} placeholder='Email' name='email' onChange={handleChange} autoComplete='off' />
+            </Form.Group>
+            
+            <Button onClick={handleSubmit} variant="primary" type="submit">
+                Log In
+            </Button>
+        </Form>
 	)
 }

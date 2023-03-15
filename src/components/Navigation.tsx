@@ -11,7 +11,7 @@ export function Navigation(props: INavigationProps) {
                 <Nav className='mr-auto'>
                     <Nav.Link href='/browse'>Browse</Nav.Link>
                     <Nav.Link href='/login'>Login</Nav.Link>
-                    <Nav.Link href='/'>Logout</Nav.Link>
+                    <Nav.Link href='/logout'>Logout</Nav.Link>
                 </Nav>
             </Navbar.Collapse>
         </Navbar>

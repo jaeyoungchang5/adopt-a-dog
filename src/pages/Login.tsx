@@ -2,12 +2,12 @@
 import { useState } from 'react';
 import { Button, Form } from 'react-bootstrap';
 import { login } from '../middleware';
-import { IUser } from '../interfaces';
+import { User } from '../interfaces';
 
 interface ILoginPageProps {}
 
 export function Login(props: ILoginPageProps) {
-	const [user, setUser] = useState<IUser>({
+	const [user, setUser] = useState<User>({
 		name: '',
 		email: ''
 	});

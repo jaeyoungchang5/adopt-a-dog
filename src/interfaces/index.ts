@@ -1,1 +1,2 @@
-export * from './interfaces';
+export * from './general.interfaces';
+export * from'./data.interfaces';

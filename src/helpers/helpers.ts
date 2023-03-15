@@ -13,6 +13,11 @@ export async function loadMatchHelper(dogIDs: string[]) {
     return dogs[0];
 }
 
-export function formatUrlParams() {
+export function formatUrlParams(params?: ILoadDogsQueryParams) {
+    const queryStrings = ['?'];
+    if (params?.size) {
+        queryStrings.push('size=' + params.size);
+    }
 
+    return queryStrings.join('');
 }

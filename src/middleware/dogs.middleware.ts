@@ -1,3 +1,4 @@
+import { formatUrlParams } from '../helpers';
 import { ILoadDogsQueryParams } from '../interfaces';
 
 const { REACT_APP_FETCH_BACKEND_API = '', REACT_APP_FETCH_API_KEY = '' } = process.env;
@@ -16,7 +17,9 @@ export async function getDogs(dogIDs: string[]) {
 }
 
 export async function searchDogs(loadDogsQueryParams?: ILoadDogsQueryParams) {
-    const res = await fetch(REACT_APP_FETCH_BACKEND_API + '/dogs/search', {
+    const queryString = formatUrlParams(loadDogsQueryParams);
+    console.log(REACT_APP_FETCH_BACKEND_API + '/dogs/search' + queryString)
+    const res = await fetch(REACT_APP_FETCH_BACKEND_API + '/dogs/search' + queryString, {
         credentials: 'include',
         headers: { 'fetch-api-key': REACT_APP_FETCH_API_KEY }
     });

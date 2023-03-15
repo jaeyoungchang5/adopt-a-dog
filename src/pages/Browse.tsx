@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { DogCard } from '../components';
 import { Dog, IDog, ILoadDogsQueryParams } from '../interfaces';
 import { getBreeds } from '../middleware';
@@ -14,40 +14,16 @@ export function Browse(props: IBrowsePageProps) {
     const [breeds, setBreeds] = useState<string[]>([]);
     const [queryParams, setQueryParams] = useState<ILoadDogsQueryParams>({});
 
-    useEffect(() => {
-        loadBreeds();
-    }, []);
-
-    useEffect(() => {
-        loadDogs();
-    }, [queryParams]);
-
-    function toggleFavorite(dogID: string): void {
-        if (favorites.indexOf(dogID) > -1) {
-            // already in the array
-            setFavorites(favorites.filter((value) => value !== dogID));
-        } else {
-            // not in the array
-            setFavorites([dogID, ...favorites]);
-        }
-        console.log(favorites);
-    }
-
-    async function handleMatchClick() {
-        if (favorites.length === 0) {
-            return;
-        }
+    /** Section: API Calls */
+    const loadDogsCallback = useCallback(async() => {
         try {
-            const match = await loadMatchHelper(favorites);
-            console.log(match);
+            const dogs = await loadDogsHelper(queryParams);
+            setDogs(dogs);
+
         } catch (err) {
-
+            console.log('caught error');
         }
-    }
-
-    function handleRefreshSearch() {
-        loadDogs();
-    }
+    }, [queryParams]);
 
     async function loadBreeds() {
         try {
@@ -58,14 +34,49 @@ export function Browse(props: IBrowsePageProps) {
         }
     }
 
-    async function loadDogs() {
+    async function loadMatch() {
         try {
-            const dogs = await loadDogsHelper(queryParams);
-            setDogs(dogs);
-
+            const match = await loadMatchHelper(favorites);
+            console.log(favorites);
+            console.log(match);
         } catch (err) {
-            console.log('caught error');
+
         }
+    }
+
+    /** Section: useEffect */
+    useEffect(() => {
+        setQueryParams({
+            size: 5
+        })
+        loadBreeds();
+    }, []);
+
+    useEffect(() => {
+        loadDogsCallback();
+    }, [loadDogsCallback, queryParams]);
+
+    /** Section: Functions */
+    function toggleFavorite(dogID: string): void {
+        if (favorites.indexOf(dogID) > -1) {
+            // already in the array
+            setFavorites(favorites.filter((value) => value !== dogID));
+        } else {
+            // not in the array
+            setFavorites([dogID, ...favorites]);
+        }
+    }
+
+    /** Section: Handlers */
+    function handleRefreshSearch() {
+        loadDogsCallback();
+    }
+
+    function handleMatchClick() {
+        if (favorites.length === 0) {
+            return;
+        }
+        loadMatch();
     }
 
     return (
@@ -74,8 +85,12 @@ export function Browse(props: IBrowsePageProps) {
             <Button onClick={handleRefreshSearch} variant='primary'>Refresh</Button>
 
             {dogs.map((dog, index) => {
+                const isFavorite = favorites.indexOf(dog.id) > -1 ? true : false;
+                if (favorites.indexOf(dog.id) >- 1) {
+                    dog.isFavorite = true;
+                }
                 return (
-                    <DogCard dog={dog} toggleFavorite={toggleFavorite} key={index} />
+                    <DogCard dog={dog} toggleFavorite={toggleFavorite} isFavorite={isFavorite} key={index} />
                 )
             })}
         </div>

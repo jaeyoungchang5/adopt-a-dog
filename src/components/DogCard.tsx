@@ -4,11 +4,11 @@ import { IDog } from '../interfaces';
 
 interface IDogCardProps {
     dog: IDog,
-    toggleFavorite: (dogID: string) => void
+    toggleFavorite: (dogID: string) => void,
+    isFavorite: boolean
 }
 
-export function DogCard({ dog, toggleFavorite }: IDogCardProps) {
-
+export function DogCard({ dog, toggleFavorite, isFavorite }: IDogCardProps) {
     function handleToggleFavorite() {
         toggleFavorite(dog.id);
     }
@@ -21,7 +21,7 @@ export function DogCard({ dog, toggleFavorite }: IDogCardProps) {
                 <Card.Text>{dog.age}</Card.Text>
                 <Card.Text>{dog.zip_code}</Card.Text>
                 <Card.Text>{dog.breed}</Card.Text>
-                <Button onClick={handleToggleFavorite} variant='primary'>Favorite</Button>
+                <Button onClick={handleToggleFavorite} variant={isFavorite ? 'warning' : 'primary'}>Favorite</Button>
             </Card.Body>
         </Card>
     )

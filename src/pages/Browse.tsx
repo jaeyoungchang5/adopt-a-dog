@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { DogCard, Filter } from '../components';
 import { Dog, IDog, ILoadDogsQueryParams } from '../interfaces';
 import { loadDogsHelper, loadMatchHelper } from '../helpers';
-import { Button } from 'react-bootstrap';
+import { Button, Col, Container, Row } from 'react-bootstrap';
 
 interface IBrowsePageProps {}
 
@@ -76,25 +76,37 @@ export function Browse(props: IBrowsePageProps) {
     }
 
     return (
-        <div>
-            <Filter queryParams={queryParams} updateQueryParams={updateQueryParams} />
-            <Button onClick={handleMatchClick} variant='primary'>Match Me</Button>
-            <Button onClick={handleRefreshSearch} variant='primary'>Refresh</Button>
+        <Container>
+            <Row>
+                <Col>
+                     <Filter queryParams={queryParams} updateQueryParams={updateQueryParams} />
+                </Col>
+                <Col>
+                    <Button onClick={handleMatchClick} variant='primary'>Match Me</Button>
+                </Col>
+                <Col>
+                    <Button onClick={handleRefreshSearch} variant='primary'>Refresh</Button>
+                </Col>
+            </Row>
 
-            {match ?
-                <DogCard dog={match} toggleFavorite={toggleFavorite} isFavorite={true} />
-            : null
-            }
-
-            {dogs.map((dog, index) => {
-                const isFavorite = favorites.indexOf(dog.id) > -1 ? true : false;
-                if (favorites.indexOf(dog.id) >- 1) {
-                    dog.isFavorite = true;
+            <Row>
+                {match ?
+                    <DogCard dog={match} toggleFavorite={toggleFavorite} isFavorite={true} />
+                : null
                 }
-                return (
-                    <DogCard dog={dog} toggleFavorite={toggleFavorite} isFavorite={isFavorite} key={index} />
-                )
-            })}
-        </div>
+            </Row>
+            <Row>
+
+                {dogs.map((dog, index) => {
+                    const isFavorite = favorites.indexOf(dog.id) > -1 ? true : false;
+                    if (favorites.indexOf(dog.id) >- 1) {
+                        dog.isFavorite = true;
+                    }
+                    return (
+                        <DogCard dog={dog} toggleFavorite={toggleFavorite} isFavorite={isFavorite} key={index} />
+                    )
+                })}
+            </Row>
+        </Container>
     )
 }

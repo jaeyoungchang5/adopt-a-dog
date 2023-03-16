@@ -5,13 +5,13 @@ import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import { Home, Login, Browse, Logout } from './pages';
 import { Navigation } from './components';
 
-import "bootstrap/dist/css/bootstrap.min.css"
+import './App.css';
 
 function App() {
 	return (
 		<Router>
 			<Navigation />
-			<Container>
+			<Container className='App'>
 				<Routes>
 					<Route path='/' element={<Home />} />
 					<Route path='/login' element={<Login />} />

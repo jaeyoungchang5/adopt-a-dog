@@ -1,0 +1,13 @@
+.App {
+    text-align: center;
+}
+
+row > .dogCard {
+    width: 33%;
+}
+
+.dogImage {
+    object-fit: cover;
+    width: 250px;
+    height: 250px;
+}

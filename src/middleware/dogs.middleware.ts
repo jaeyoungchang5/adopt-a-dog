@@ -18,7 +18,7 @@ export async function getDogs(dogIDs: string[]) {
 
 export async function searchDogs(loadDogsQueryParams?: ILoadDogsQueryParams) {
     const queryString = formatUrlParams(loadDogsQueryParams);
-    console.log(REACT_APP_FETCH_BACKEND_API + '/dogs/search' + queryString)
+    console.log('Search Dogs with: ' + REACT_APP_FETCH_BACKEND_API + '/dogs/search' + queryString)
     const res = await fetch(REACT_APP_FETCH_BACKEND_API + '/dogs/search' + queryString, {
         credentials: 'include',
         headers: { 'fetch-api-key': REACT_APP_FETCH_API_KEY }

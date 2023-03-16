@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { DogCard } from '../components';
+import { DogCard, Filter } from '../components';
 import { Dog, IDog, ILoadDogsQueryParams } from '../interfaces';
 import { getBreeds } from '../middleware';
 import { loadDogsHelper, loadMatchHelper } from '../helpers';
@@ -11,8 +11,15 @@ export function Browse(props: IBrowsePageProps) {
     const [dogs, setDogs] = useState<IDog[]>([]);
     const [match, setMatch] = useState<Dog>();
     const [favorites, setFavorites] = useState<string[]>([]);
-    const [breeds, setBreeds] = useState<string[]>([]);
-    const [queryParams, setQueryParams] = useState<ILoadDogsQueryParams>({});
+    const [queryParams, setQueryParams] = useState<ILoadDogsQueryParams>({
+        breeds: [],
+        zipCodes: [],
+        ageMin: 0,
+        ageMax: 100,
+        size: 5, // reset to 25
+        from: '',
+        sort: ''
+    });
 
     /** Section: API Calls */
     const loadDogsCallback = useCallback(async() => {
@@ -24,15 +31,6 @@ export function Browse(props: IBrowsePageProps) {
             console.log('caught error');
         }
     }, [queryParams]);
-
-    async function loadBreeds() {
-        try {
-            const data = await getBreeds();
-            setBreeds(data);
-        } catch (err) {
-            
-        }
-    }
 
     async function loadMatch() {
         try {
@@ -46,17 +44,13 @@ export function Browse(props: IBrowsePageProps) {
 
     /** Section: useEffect */
     useEffect(() => {
-        setQueryParams({
-            size: 5
-        })
-        loadBreeds();
     }, []);
 
     useEffect(() => {
         loadDogsCallback();
-    }, [loadDogsCallback, queryParams]);
+    }, [loadDogsCallback]);
 
-    /** Section: Functions */
+    /** Section: Callbacks */
     function toggleFavorite(dogID: string): void {
         if (favorites.indexOf(dogID) > -1) {
             // already in the array
@@ -65,6 +59,13 @@ export function Browse(props: IBrowsePageProps) {
             // not in the array
             setFavorites([dogID, ...favorites]);
         }
+    }
+
+    function updateQueryParams(queryParams: ILoadDogsQueryParams): void {
+        console.log('QUERY PARAMS');
+        console.log(queryParams);
+        console.log('END QUERY PARAMS');
+        setQueryParams(queryParams);
     }
 
     /** Section: Handlers */
@@ -81,6 +82,7 @@ export function Browse(props: IBrowsePageProps) {
 
     return (
         <div>
+            <Filter queryParams={queryParams} updateQueryParams={updateQueryParams} />
             <Button onClick={handleMatchClick} variant='primary'>Match Me</Button>
             <Button onClick={handleRefreshSearch} variant='primary'>Refresh</Button>
 

@@ -1,8 +1,9 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { DogCard, Filter } from '../components';
+import { DogCard, Filter, Sort } from '../components';
 import { Dog, IDog, ILoadDogsQueryParams } from '../interfaces';
 import { loadDogsHelper, loadMatchHelper } from '../helpers';
-import { Button, Col, Container, Row } from 'react-bootstrap';
+import { Button, Col, Container, Row, Toast, ToastContainer } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom';
 
 interface IBrowsePageProps {}
 
@@ -19,6 +20,9 @@ export function Browse(props: IBrowsePageProps) {
         from: '',
         sort: ''
     });
+    const [showToast, setShowToast] = useState<boolean>(false);
+
+    const navigate = useNavigate();
 
     /** Section: API Calls */
     const loadDogsCallback = useCallback(async() => {
@@ -27,7 +31,7 @@ export function Browse(props: IBrowsePageProps) {
             setDogs(dogs);
 
         } catch (err) {
-            console.log('caught error');
+            setShowToast(true);
         }
     }, [queryParams]);
 
@@ -75,11 +79,22 @@ export function Browse(props: IBrowsePageProps) {
         loadMatch();
     }
 
+    function closeToast() {
+        setShowToast(false);
+        navigate('/login');
+    }
+
     return (
         <Container>
+
+            <RedirectToast showToast={showToast} closeToast={closeToast} />
+
             <Row>
                 <Col>
                      <Filter queryParams={queryParams} updateQueryParams={updateQueryParams} />
+                </Col>
+                <Col>
+                     <Sort />
                 </Col>
                 <Col>
                     <Button onClick={handleMatchClick} variant='primary'>Match Me</Button>
@@ -108,5 +123,25 @@ export function Browse(props: IBrowsePageProps) {
                 })}
             </Row>
         </Container>
+    )
+}
+
+interface IRedirectToastProps {
+    showToast: boolean,
+    closeToast: () => void
+}
+
+function RedirectToast({showToast, closeToast}: IRedirectToastProps) {
+    return (
+        <ToastContainer position='top-center'>
+            <Toast show={showToast} onClose={closeToast} bg='light' delay={3000} autohide>
+                <Toast.Header>
+                    <strong className='me-auto'>You have been signed out.</strong>
+                </Toast.Header>
+                <Toast.Body>
+                    Please log in again.
+                </Toast.Body>
+            </Toast>
+        </ToastContainer>
     )
 }

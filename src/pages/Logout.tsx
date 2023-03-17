@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import { Spinner } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { logout } from '../middleware';
@@ -9,15 +9,19 @@ export function Logout(props: ILogoutProps) {
 
     const navigate = useNavigate();
 
-    useEffect(() => {
+    const logoutCallback = useCallback(async() => {
         try {
-            logout().then(() => {
-                navigate('/', {replace: true});
-            })
+            await logout();
         } catch (err) {
-            
         }
+
+        navigate('/login', {replace: true});
     }, [navigate]);
+
+    useEffect(() => {
+        logoutCallback();
+    }, [logoutCallback]);
+
 
     return (
         <Spinner />

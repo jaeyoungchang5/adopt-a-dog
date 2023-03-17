@@ -14,3 +14,10 @@ export interface IDogSearchResults {
     next: string,
     prev: string
 }
+
+export interface IFilterOptions {
+	Clear: boolean,
+    Breeds: string[],
+    Color: string[],
+    For: string[]
+}

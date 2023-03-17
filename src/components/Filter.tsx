@@ -1,22 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { Col, Container, Dropdown, ListGroup, Row } from 'react-bootstrap';
 import { getBreeds } from '../middleware';
-import { ILoadDogsQueryParams } from '../interfaces';
+import { ILoadDogsQueryParams, IFilterOptions } from '../interfaces';
 
 interface IFilterProps {
 	queryParams: ILoadDogsQueryParams,
     updateQueryParams: (queryParams: ILoadDogsQueryParams) => void,
 }
 
-interface IOptions {
-	Clear: boolean,
-    Breeds: string[],
-    Color: string[],
-    For: string[]
-}
-
 export function Filter({ queryParams, updateQueryParams }: IFilterProps) {
-	const [filterMenuOptions, setFilterMenuOptions] = useState<IOptions>({
+	const [filterMenuOptions, setFilterMenuOptions] = useState<IFilterOptions>({
 		Clear: true,
 		Breeds: [],
 		Color: [],

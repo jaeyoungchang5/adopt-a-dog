@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { DogCard, Filter, Sort } from '../components';
 import { Dog, IDog, Location, ILocations, ILoadDogsQueryParams } from '../interfaces';
 import { loadDogsHelper, loadLocationsHelper, loadMatchHelper } from '../helpers';
-import { Button, Col, Container, Row, Toast, ToastContainer } from 'react-bootstrap';
+import { Button, Toast, ToastContainer } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 
 interface IBrowsePageProps {}
@@ -104,33 +104,24 @@ export function Browse(props: IBrowsePageProps) {
     }
 
     return (
-        <Container className='browser'>
+        <div className='browse'>
 
             <RedirectToast showToast={showToast} closeToast={closeToast} />
 
-            <Row>
-                <Col>
-                     <Filter queryParams={queryParams} updateQueryParams={updateQueryParams} />
-                </Col>
-                <Col>
-                     <Sort />
-                </Col>
-                <Col>
-                    <Button onClick={handleMatchClick} variant='primary'>Match Me</Button>
-                </Col>
-                <Col>
-                    <Button onClick={handleRefreshSearch} variant='primary'>Refresh</Button>
-                </Col>
-            </Row>
+                <Filter queryParams={queryParams} updateQueryParams={updateQueryParams} />
 
-            <Row>
+                <Sort />
+
+                <Button onClick={handleMatchClick} variant='primary'>Match Me</Button>
+
+                <Button onClick={handleRefreshSearch} variant='primary'>Refresh</Button>
+
+
                 {match ?
                     <DogCard dog={match} toggleFavorite={toggleFavorite} isFavorite={true} />
                 : null
                 }
-            </Row>
-            <Row>
-
+            <div className='dogCards'>
                 {dogs.map((dog, index) => {
                     const isFavorite = favorites.indexOf(dog.id) > -1 ? true : false;
                     if (locations[dog.zip_code]) {
@@ -139,10 +130,11 @@ export function Browse(props: IBrowsePageProps) {
                     }
                     return (
                         <DogCard dog={dog} toggleFavorite={toggleFavorite} isFavorite={isFavorite} key={index} />
+
                     )
                 })}
-            </Row>
-        </Container>
+            </div>
+        </div>
     )
 }
 

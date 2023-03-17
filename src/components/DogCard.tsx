@@ -13,7 +13,8 @@ export function DogCard({ dog, toggleFavorite, isFavorite }: IDogCardProps) {
     }
 
     return (
-        <Card className='dogCard'>
+        <div className='dogCard'>
+        <Card>
             <Card.Img variant='top' src={dog.img} className='dogImage' />
             <Card.Body>
                 <Card.Title>{dog.name}</Card.Title>
@@ -27,5 +28,6 @@ export function DogCard({ dog, toggleFavorite, isFavorite }: IDogCardProps) {
                 <Button onClick={handleToggleFavorite} variant={isFavorite ? 'warning' : 'primary'}>Favorite</Button>
             </Card.Body>
         </Card>
+        </div>
     )
 }

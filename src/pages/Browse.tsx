@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { DogCard, Filter, Sort } from '../components';
-import { Dog, IDog, ILoadDogsQueryParams } from '../interfaces';
-import { loadDogsHelper, loadMatchHelper } from '../helpers';
+import { Dog, IDog, Location, ILocations, ILoadDogsQueryParams } from '../interfaces';
+import { loadDogsHelper, loadLocationsHelper, loadMatchHelper } from '../helpers';
 import { Button, Col, Container, Row, Toast, ToastContainer } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 
@@ -9,8 +9,10 @@ interface IBrowsePageProps {}
 
 export function Browse(props: IBrowsePageProps) {
     const [dogs, setDogs] = useState<IDog[]>([]);
+    const [locations, setLocations] = useState<ILocations>({});
     const [match, setMatch] = useState<Dog>();
     const [favorites, setFavorites] = useState<string[]>([]);
+    const [showToast, setShowToast] = useState<boolean>(false);
     const [queryParams, setQueryParams] = useState<ILoadDogsQueryParams>({
         breeds: [],
         zipCodes: [],
@@ -20,25 +22,32 @@ export function Browse(props: IBrowsePageProps) {
         from: '',
         sort: ''
     });
-    const [showToast, setShowToast] = useState<boolean>(false);
 
     const navigate = useNavigate();
 
     /** Section: API Calls */
     const loadDogsCallback = useCallback(async() => {
         try {
-            const dogs = await loadDogsHelper(queryParams);
-            setDogs(dogs);
-
+            const newDogs = await loadDogsHelper(queryParams);
+            setDogs(newDogs);
         } catch (err) {
             setShowToast(true);
         }
     }, [queryParams]);
 
+    const loadLocationsCallback = useCallback(async() => {
+        try {
+            await loadLocationsHelper(dogs, locations, updateLocation);
+            console.log(Object.keys(locations).length + ' locations!');
+        } catch (err) {
+
+        }
+    }, [dogs, locations]);
+
     async function loadMatch() {
         try {
-            const match = await loadMatchHelper(favorites);
-            setMatch(match);
+            const newMatch = await loadMatchHelper(favorites);
+            setMatch(newMatch);
         } catch (err) {
 
         }
@@ -46,13 +55,14 @@ export function Browse(props: IBrowsePageProps) {
 
     /** Section: useEffect */
     useEffect(() => {
-    }, []);
+        loadLocationsCallback();
+    }, [loadLocationsCallback]);
 
     useEffect(() => {
         loadDogsCallback();
     }, [loadDogsCallback]);
 
-    /** Section: Callbacks */
+    /** Section: Callback Functions */
     function toggleFavorite(dogID: string): void {
         if (favorites.indexOf(dogID) > -1) {
             // already in the array
@@ -65,6 +75,15 @@ export function Browse(props: IBrowsePageProps) {
 
     function updateQueryParams(queryParams: ILoadDogsQueryParams): void {
         setQueryParams(queryParams);
+    }
+
+    function updateLocation(location: Location) {
+        setLocations((prev) => {
+            return {
+                ...prev,
+                [location.zip_code]: location
+            }
+        })
     }
 
     /** Section: Handlers */
@@ -85,7 +104,7 @@ export function Browse(props: IBrowsePageProps) {
     }
 
     return (
-        <Container>
+        <Container className='browser'>
 
             <RedirectToast showToast={showToast} closeToast={closeToast} />
 
@@ -114,8 +133,9 @@ export function Browse(props: IBrowsePageProps) {
 
                 {dogs.map((dog, index) => {
                     const isFavorite = favorites.indexOf(dog.id) > -1 ? true : false;
-                    if (favorites.indexOf(dog.id) >- 1) {
-                        dog.isFavorite = true;
+                    if (locations[dog.zip_code]) {
+                        dog.city = locations[dog.zip_code].city;
+                        dog.state = locations[dog.zip_code].state;
                     }
                     return (
                         <DogCard dog={dog} toggleFavorite={toggleFavorite} isFavorite={isFavorite} key={index} />

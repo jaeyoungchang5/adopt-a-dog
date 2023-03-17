@@ -12,8 +12,22 @@ export interface Dog {
     breed: string,
 }
 
+export interface Location {
+    zip_code: number,
+    latitude: number,
+    longitude: number,
+    city: string,
+    state: string,
+    county: string
+}
+
+export interface ILocations {
+    [key: number]: Location
+}
+
 export interface IDog extends Dog {
-    isFavorite?: boolean
+    city?: string,
+    state?: string
 }
 
 export interface Match {

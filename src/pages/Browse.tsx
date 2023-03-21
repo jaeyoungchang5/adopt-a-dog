@@ -18,7 +18,7 @@ export function Browse(props: IBrowsePageProps) {
         zipCodes: [],
         ageMin: 0,
         ageMax: 100,
-        size: 5, // reset to 25
+        size: 6, // reset to 25
         from: '',
         sort: ''
     });
@@ -108,20 +108,18 @@ export function Browse(props: IBrowsePageProps) {
 
             <RedirectToast showToast={showToast} closeToast={closeToast} />
 
-                <Filter queryParams={queryParams} updateQueryParams={updateQueryParams} />
-
-                <Sort />
-
-                <Button onClick={handleMatchClick} variant='primary'>Match Me</Button>
-
+            <div className='optionsBar'>
                 <Button onClick={handleRefreshSearch} variant='primary'>Refresh</Button>
+                <Button onClick={handleMatchClick} variant='primary'>Match Me</Button>
+                <Filter queryParams={queryParams} updateQueryParams={updateQueryParams} />
+                <Sort />
+            </div>
 
-
-                {match ?
+            <div className='dogCards'>
+                 {match ?
                     <DogCard dog={match} toggleFavorite={toggleFavorite} isFavorite={true} />
                 : null
                 }
-            <div className='dogCards'>
                 {dogs.map((dog, index) => {
                     const isFavorite = favorites.indexOf(dog.id) > -1 ? true : false;
                     if (locations[dog.zip_code]) {

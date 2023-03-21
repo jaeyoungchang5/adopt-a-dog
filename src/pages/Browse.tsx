@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { DogCard, Filter, Sort } from '../components';
+import { DogCard, Filter, Sort, PaginationComponent as Pagination } from '../components';
 import { Dog, IDog, Location, ILocations, ILoadDogsQueryParams } from '../interfaces';
 import { loadDogsHelper, loadLocationsHelper, loadMatchHelper } from '../helpers';
 import { Button, Toast, ToastContainer } from 'react-bootstrap';
@@ -13,6 +13,7 @@ export function Browse(props: IBrowsePageProps) {
     const [match, setMatch] = useState<Dog>();
     const [favorites, setFavorites] = useState<string[]>([]);
     const [showToast, setShowToast] = useState<boolean>(false);
+    const [currentPage, setCurrentPage] = useState<number>(1);
     const [queryParams, setQueryParams] = useState<ILoadDogsQueryParams>({
         breeds: [],
         zipCodes: [],
@@ -132,6 +133,8 @@ export function Browse(props: IBrowsePageProps) {
                     )
                 })}
             </div>
+
+            <Pagination itemsCount={10000} itemsPerPage={50} currentPage={currentPage} setCurrentPage={setCurrentPage} />
         </div>
     )
 }

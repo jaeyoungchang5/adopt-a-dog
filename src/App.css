@@ -5,7 +5,7 @@
 
 .browse {
     display: flex;
-    padding-top: 10px;
+    padding: 5px;
     flex-direction: column;
     overflow-x: auto;
 }
@@ -19,7 +19,6 @@
     display: flex;
     flex-wrap: wrap;
     flex-direction: row;
-    padding: 5px;
 }
 
 .dogCard {
@@ -32,4 +31,10 @@
 .dogImage {
     object-fit: cover;
     height: 250px;
+}
+
+.favoriteButton {
+    position: absolute;
+    top: 5px;
+    right: 5px;
 }

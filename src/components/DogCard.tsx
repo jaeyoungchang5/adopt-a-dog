@@ -1,6 +1,8 @@
 import React from 'react';
 import { Button, Card } from 'react-bootstrap';
 import { IDog } from '../interfaces';
+import { faStar } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 interface IDogCardProps {
     dog: IDog,
     toggleFavorite: (dogID: string) => void,
@@ -14,9 +16,6 @@ export function DogCard({ dog, toggleFavorite, isFavorite }: IDogCardProps) {
 
     return (
         <div className='dogCard'>
-            {/* <img src={dog.img} className='dogImage' alt={`${dog.name}`} />
-            <h3>{dog.name}</h3>
-            <button>Click</button> */}
             <Card>
                 <Card.Img variant='top' src={dog.img} className='dogImage' />
                 <Card.Body>
@@ -28,7 +27,9 @@ export function DogCard({ dog, toggleFavorite, isFavorite }: IDogCardProps) {
                         <Card.Text>Zip Code: {dog.zip_code}</Card.Text>
                     }
                     <Card.Text>{dog.breed}</Card.Text>
-                    <Button onClick={handleToggleFavorite} variant={isFavorite ? 'warning' : 'primary'}>Favorite</Button>
+                    <Button className='favoriteButton' onClick={handleToggleFavorite} variant={isFavorite ? 'warning' : 'secondary'}>
+                        <FontAwesomeIcon icon={faStar} />
+                    </Button>
                 </Card.Body>
             </Card>
         </div>

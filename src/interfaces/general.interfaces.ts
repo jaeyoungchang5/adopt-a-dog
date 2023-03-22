@@ -4,7 +4,7 @@ export interface ILoadDogsQueryParams {
     ageMin: number,
     ageMax: number,
     size: number,
-    from: string,
+    from: number,
     sort: string
 }
 

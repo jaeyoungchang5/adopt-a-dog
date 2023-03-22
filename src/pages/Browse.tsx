@@ -1,9 +1,10 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { DogCard, Filter, Sort, PaginationComponent as Pagination } from '../components';
-import { Dog, IDog, Location, ILocations, ILoadDogsQueryParams } from '../interfaces';
-import { loadDogsHelper, loadLocationsHelper, loadMatchHelper } from '../helpers';
+import { Dog, IDog, Location, ILocations, ILoadDogsQueryParams, IDogSearchResults } from '../interfaces';
+import { loadLocationsHelper, loadMatchHelper } from '../helpers';
 import { Button, Toast, ToastContainer } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
+import { searchDogs, getDogs } from '../middleware';
 
 interface IBrowsePageProps {}
 
@@ -13,6 +14,12 @@ export function Browse(props: IBrowsePageProps) {
     const [match, setMatch] = useState<Dog>();
     const [favorites, setFavorites] = useState<string[]>([]);
     const [showToast, setShowToast] = useState<boolean>(false);
+    const [searchResults, setSearchResults] = useState<IDogSearchResults>({
+        resultIds: [],
+        total: 10000, // default max number of dog results
+        next: '',
+        prev: ''
+    });
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [queryParams, setQueryParams] = useState<ILoadDogsQueryParams>({
         breeds: [],
@@ -20,7 +27,7 @@ export function Browse(props: IBrowsePageProps) {
         ageMin: 0,
         ageMax: 100,
         size: 6, // reset to 25
-        from: '',
+        from: 0,
         sort: ''
     });
 
@@ -39,7 +46,6 @@ export function Browse(props: IBrowsePageProps) {
     const loadLocationsCallback = useCallback(async() => {
         try {
             await loadLocationsHelper(dogs, locations, updateLocation);
-            console.log(Object.keys(locations).length + ' locations!');
         } catch (err) {
 
         }
@@ -54,6 +60,13 @@ export function Browse(props: IBrowsePageProps) {
         }
     }
 
+    async function loadDogsHelper(loadDogsQueryParams?: ILoadDogsQueryParams) {
+        const searchResults: IDogSearchResults = await searchDogs(loadDogsQueryParams);
+        setSearchResults(searchResults);
+        const dogs: Dog[] = await getDogs(searchResults.resultIds);
+        return dogs;
+    }
+
     /** Section: useEffect */
     useEffect(() => {
         loadLocationsCallback();
@@ -62,6 +75,15 @@ export function Browse(props: IBrowsePageProps) {
     useEffect(() => {
         loadDogsCallback();
     }, [loadDogsCallback]);
+
+    useEffect(() => {
+        setQueryParams(prev => {
+            return {
+                ...prev,
+                from: ((currentPage-1)*prev.size)
+            }
+        })
+    }, [currentPage]);
 
     /** Section: Callback Functions */
     function toggleFavorite(dogID: string): void {
@@ -84,7 +106,7 @@ export function Browse(props: IBrowsePageProps) {
                 ...prev,
                 [location.zip_code]: location
             }
-        })
+        });
     }
 
     /** Section: Handlers */
@@ -114,6 +136,7 @@ export function Browse(props: IBrowsePageProps) {
                 <Button onClick={handleMatchClick} variant='primary'>Match Me</Button>
                 <Filter queryParams={queryParams} updateQueryParams={updateQueryParams} />
                 <Sort />
+                <Pagination itemsCount={searchResults.total} itemsPerPage={queryParams.size} currentPage={currentPage} setCurrentPage={setCurrentPage} />
             </div>
 
             <div className='dogCards'>
@@ -134,9 +157,9 @@ export function Browse(props: IBrowsePageProps) {
                 })}
             </div>
 
-            <Pagination itemsCount={10000} itemsPerPage={50} currentPage={currentPage} setCurrentPage={setCurrentPage} />
+            <Pagination itemsCount={searchResults.total} itemsPerPage={queryParams.size} currentPage={currentPage} setCurrentPage={setCurrentPage} />
         </div>
-    )
+    );
 }
 
 interface IRedirectToastProps {
@@ -156,5 +179,5 @@ function RedirectToast({showToast, closeToast}: IRedirectToastProps) {
                 </Toast.Body>
             </Toast>
         </ToastContainer>
-    )
+    );
 }

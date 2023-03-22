@@ -3,7 +3,6 @@ import { getDogs, getLocations, getMatch, searchDogs } from '../middleware';
 
 export async function loadDogsHelper(loadDogsQueryParams?: ILoadDogsQueryParams) {
     const searchResults: IDogSearchResults = await searchDogs(loadDogsQueryParams);
-    console.log('Search yielded ' + searchResults.total + ' results')
     const dogs: Dog[] = await getDogs(searchResults.resultIds);
     return dogs;
 }
@@ -31,11 +30,11 @@ export async function loadMatchHelper(dogIDs: string[]) {
     return dogs[0];
 }
 
-export function formatUrlParams(params: ILoadDogsQueryParams | undefined) {
+export function formatUrlParams(params: ILoadDogsQueryParams | undefined): string {
     const queryStrings = [];
 
     if (!params) {
-        return;
+        return '';
     }
 
     if (params.breeds.length > 0) {
@@ -57,11 +56,11 @@ export function formatUrlParams(params: ILoadDogsQueryParams | undefined) {
     }
     
     if (params.size) {
-        queryStrings.push('size=' + params.size, '&');
+        queryStrings.push(`size=${params.size}&`)
     }
 
-    if (params.from) {
-
+    if (params.from > -1) {
+        queryStrings.push(`from=${params.from}&`)
     }
 
     if (params.sort) {

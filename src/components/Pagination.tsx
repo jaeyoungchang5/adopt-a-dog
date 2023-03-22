@@ -42,12 +42,6 @@ export function PaginationComponent({ itemsCount, itemsPerPage, currentPage, set
     	changePage(currentPage + 1);
 	}
 
-	function setLastPageAsCurrent() {
-		if (currentPage > pagesCount) {
-			setCurrentPage(pagesCount);
-		}
-	}
-
 	let isPageNumberOutOfRange: boolean;
 
 	const pageNumbers = [...new Array(pagesCount)].map((_, index) => {
@@ -93,22 +87,24 @@ export function PaginationComponent({ itemsCount, itemsPerPage, currentPage, set
   	});
 
 	useEffect(() => {
-		setLastPageAsCurrent();
-	}, [pagesCount])
+		if (currentPage > pagesCount) {
+			setCurrentPage(pagesCount);
+		}
+	}, [currentPage, pagesCount, setCurrentPage])
 
 	return (
 		<>
 		{isPaginationShown && (
-			<Pagination>
-			<Pagination.Prev
-				onClick={onPreviousPageClick}
-				disabled={isCurrentPageFirst}
-			/>
-			{pageNumbers}
-			<Pagination.Next
-				onClick={onNextPageClick}
-				disabled={isCurrentPageLast}
-			/>
+			<Pagination className='pagination'>
+				<Pagination.Prev
+					onClick={onPreviousPageClick}
+					disabled={isCurrentPageFirst}
+				/>
+				{pageNumbers}
+				<Pagination.Next
+					onClick={onNextPageClick}
+					disabled={isCurrentPageLast}
+				/>
 			</Pagination>
 		)}
 		</>

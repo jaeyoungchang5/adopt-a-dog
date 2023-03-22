@@ -38,3 +38,8 @@
     top: 5px;
     right: 5px;
 }
+
+.pagination {
+    /* position: fixed;
+    bottom: 5px; */
+}

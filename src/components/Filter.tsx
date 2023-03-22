@@ -9,6 +9,10 @@ interface IFilterProps {
 }
 
 export function Filter({ queryParams, updateQueryParams }: IFilterProps) {
+	/**
+	 * Support Filter for breeds, zipCodes, ageMin-ageMax (multiple)
+	 * Use a modal for each filter
+	 */
 	const [filterMenuOptions, setFilterMenuOptions] = useState<IFilterOptions>({
 		Clear: true,
 		Breeds: [],

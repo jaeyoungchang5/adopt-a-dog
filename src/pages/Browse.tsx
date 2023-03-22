@@ -2,25 +2,24 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { DogCard, Filter, Sort, PaginationComponent as Pagination } from '../components';
 import { Dog, IDog, Location, ILocations, ILoadDogsQueryParams, IDogSearchResults } from '../interfaces';
 import { loadLocationsHelper, loadMatchHelper } from '../helpers';
-import { Button, Toast, ToastContainer } from 'react-bootstrap';
+import { Button, Modal } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { searchDogs, getDogs } from '../middleware';
 
 interface IBrowsePageProps {}
 
 export function Browse(props: IBrowsePageProps) {
+    /** Section: States */
     const [dogs, setDogs] = useState<IDog[]>([]);
     const [locations, setLocations] = useState<ILocations>({});
     const [match, setMatch] = useState<Dog>();
     const [favorites, setFavorites] = useState<string[]>([]);
-    const [showToast, setShowToast] = useState<boolean>(false);
     const [searchResults, setSearchResults] = useState<IDogSearchResults>({
         resultIds: [],
         total: 10000, // default max number of dog results
         next: '',
         prev: ''
     });
-    const [currentPage, setCurrentPage] = useState<number>(1);
     const [queryParams, setQueryParams] = useState<ILoadDogsQueryParams>({
         breeds: [],
         zipCodes: [],
@@ -28,20 +27,29 @@ export function Browse(props: IBrowsePageProps) {
         ageMax: 100,
         size: 6, // reset to 25
         from: 0,
-        sort: ''
+        sort: 'name:asc' // default sort is ascending names
     });
+    const [doSearch, setDoSearch] = useState<boolean>(true);
+    const [showModal, setShowModal] = useState<boolean>(false);
+    const [currentPage, setCurrentPage] = useState<number>(1);
 
     const navigate = useNavigate();
 
     /** Section: API Calls */
     const loadDogsCallback = useCallback(async() => {
-        try {
-            const newDogs = await loadDogsHelper(queryParams);
-            setDogs(newDogs);
-        } catch (err) {
-            setShowToast(true);
+        if (!doSearch) {
+            return;
         }
-    }, [queryParams]);
+        try {
+            const searchResults: IDogSearchResults = await searchDogs(queryParams);
+            setSearchResults(searchResults);
+            const dogs: Dog[] = await getDogs(searchResults.resultIds);
+            setDogs(dogs);
+            setDoSearch(false);
+        } catch (err) {
+            setShowModal(true);
+        }
+    }, [doSearch, queryParams]);
 
     const loadLocationsCallback = useCallback(async() => {
         try {
@@ -60,13 +68,6 @@ export function Browse(props: IBrowsePageProps) {
         }
     }
 
-    async function loadDogsHelper(loadDogsQueryParams?: ILoadDogsQueryParams) {
-        const searchResults: IDogSearchResults = await searchDogs(loadDogsQueryParams);
-        setSearchResults(searchResults);
-        const dogs: Dog[] = await getDogs(searchResults.resultIds);
-        return dogs;
-    }
-
     /** Section: useEffect */
     useEffect(() => {
         loadLocationsCallback();
@@ -82,7 +83,8 @@ export function Browse(props: IBrowsePageProps) {
                 ...prev,
                 from: ((currentPage-1)*prev.size)
             }
-        })
+        });
+        setDoSearch(true);
     }, [currentPage]);
 
     /** Section: Callback Functions */
@@ -110,8 +112,8 @@ export function Browse(props: IBrowsePageProps) {
     }
 
     /** Section: Handlers */
-    function handleRefreshSearch() {
-        loadDogsCallback();
+    function handleSearchClick() {
+        setDoSearch(true);
     }
 
     function handleMatchClick() {
@@ -121,22 +123,22 @@ export function Browse(props: IBrowsePageProps) {
         loadMatch();
     }
 
-    function closeToast() {
-        setShowToast(false);
+    function closeModal() {
+        setShowModal(false);
         navigate('/login');
     }
 
     return (
         <div className='browse'>
 
-            <RedirectToast showToast={showToast} closeToast={closeToast} />
+            <RedirectModal showModal={showModal} closeModal={closeModal} />
 
             <div className='optionsBar'>
-                <Button onClick={handleRefreshSearch} variant='primary'>Refresh</Button>
+                <Button onClick={handleSearchClick} variant='primary'>Search</Button>
                 <Button onClick={handleMatchClick} variant='primary'>Match Me</Button>
                 <Filter queryParams={queryParams} updateQueryParams={updateQueryParams} />
                 <Sort />
-                <Pagination itemsCount={searchResults.total} itemsPerPage={queryParams.size} currentPage={currentPage} setCurrentPage={setCurrentPage} />
+                {/* <Pagination itemsCount={searchResults.total} itemsPerPage={queryParams.size} currentPage={currentPage} setCurrentPage={setCurrentPage} /> */}
             </div>
 
             <div className='dogCards'>
@@ -162,22 +164,24 @@ export function Browse(props: IBrowsePageProps) {
     );
 }
 
-interface IRedirectToastProps {
-    showToast: boolean,
-    closeToast: () => void
+interface IRedirectModalProps {
+    showModal: boolean,
+    closeModal: () => void
 }
 
-function RedirectToast({showToast, closeToast}: IRedirectToastProps) {
+function RedirectModal({showModal, closeModal}: IRedirectModalProps) {
     return (
-        <ToastContainer position='top-center'>
-            <Toast show={showToast} onClose={closeToast} bg='light' delay={3000} autohide>
-                <Toast.Header>
-                    <strong className='me-auto'>You have been signed out.</strong>
-                </Toast.Header>
-                <Toast.Body>
-                    Please log in again.
-                </Toast.Body>
-            </Toast>
-        </ToastContainer>
+        <Modal show={showModal} onClose={closeModal} bg='light' delay={3000} autohide>
+            <Modal.Header closeButton>
+                <strong className='me-auto'>You have been signed out.</strong>
+            </Modal.Header>
+            <Modal.Body>
+                Please log in again.
+            </Modal.Body>
+            <Modal.Footer>
+                {/* <Button variant='secondary'>Go Home</Button> */}
+                <Button variant='primary' onClick={closeModal}>Log in</Button>
+            </Modal.Footer>
+        </Modal>
     );
 }

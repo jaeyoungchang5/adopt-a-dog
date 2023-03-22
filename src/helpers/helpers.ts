@@ -1,11 +1,5 @@
-import { Dog, Location, ILocations, IDogSearchResults, ILoadDogsQueryParams, Match } from '../interfaces';
-import { getDogs, getLocations, getMatch, searchDogs } from '../middleware';
-
-export async function loadDogsHelper(loadDogsQueryParams?: ILoadDogsQueryParams) {
-    const searchResults: IDogSearchResults = await searchDogs(loadDogsQueryParams);
-    const dogs: Dog[] = await getDogs(searchResults.resultIds);
-    return dogs;
-}
+import { Dog, Location, ILocations, ILoadDogsQueryParams, Match } from '../interfaces';
+import { getDogs, getLocations, getMatch } from '../middleware';
 
 export async function loadLocationsHelper(dogs: Dog[], existingLocations: ILocations, updateLocation: (location: Location) => void) {
     const zipCodes: number[] = [];
@@ -64,7 +58,7 @@ export function formatUrlParams(params: ILoadDogsQueryParams | undefined): strin
     }
 
     if (params.sort) {
-
+        queryStrings.push(`sort=${params.sort}&`)
     }
 
 

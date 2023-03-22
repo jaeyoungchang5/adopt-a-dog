@@ -48,13 +48,9 @@ export function PaginationComponent({ itemsCount, itemsPerPage, currentPage, set
 		const pageNumber = index + 1;
 		const isPageNumberFirst = pageNumber === 1;
 		const isPageNumberLast = pageNumber === pagesCount;
-		const isCurrentPageWithinOnePageNumber = Math.abs(pageNumber - currentPage) <= 1;
+		const isCurrentPageWithinTwoPageNumber = Math.abs(pageNumber - currentPage) <= 2;
 
-		if (
-			// isPageNumberFirst ||
-			// isPageNumberLast ||
-			isCurrentPageWithinOnePageNumber
-		) {
+		if (isPageNumberFirst || isPageNumberLast || isCurrentPageWithinTwoPageNumber) {
 			isPageNumberOutOfRange = false;
 			return (
 				<Pagination.Item
@@ -65,17 +61,6 @@ export function PaginationComponent({ itemsCount, itemsPerPage, currentPage, set
 					{pageNumber}
 				</Pagination.Item>
 			);
-		}
-
-		if (isPageNumberFirst || isPageNumberLast) {
-			return (
-				<Pagination.Item
-					key={pageNumber}
-					disabled
-				>
-					{pageNumber}
-				</Pagination.Item>
-			)
 		}
 
 		if (!isPageNumberOutOfRange) {

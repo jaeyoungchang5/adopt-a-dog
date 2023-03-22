@@ -1,10 +1,10 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { DogCard, Filter, Sort, PaginationComponent as Pagination } from '../components';
-import { Dog, IDog, Location, ILocations, ILoadDogsQueryParams, IDogSearchResults } from '../interfaces';
-import { loadLocationsHelper, loadMatchHelper } from '../helpers';
-import { Button, Modal } from 'react-bootstrap';
-import { useNavigate } from 'react-router-dom';
-import { searchDogs, getDogs } from '../middleware';
+import { DogCard, Filter, Sort, PaginationComponent as Pagination, RedirectModal } from '../components';
+import { Dog, IDog, Location, ILocations, ILoadDogsQueryParams, IDogSearchResults, Match } from '../interfaces';
+import { loadLocationsHelper } from '../helpers';
+import { Button } from 'react-bootstrap';
+import { searchDogs, getDogs, getMatch } from '../middleware';
+import { MatchModal } from '../components/MatchModal';
 
 interface IBrowsePageProps {}
 
@@ -12,7 +12,7 @@ export function Browse(props: IBrowsePageProps) {
     /** Section: States */
     const [dogs, setDogs] = useState<IDog[]>([]);
     const [locations, setLocations] = useState<ILocations>({});
-    const [match, setMatch] = useState<Dog>();
+    const [matchID, setMatchID] = useState<string>('');
     const [favorites, setFavorites] = useState<string[]>([]);
     const [searchResults, setSearchResults] = useState<IDogSearchResults>({
         resultIds: [],
@@ -30,10 +30,9 @@ export function Browse(props: IBrowsePageProps) {
         sort: 'name:asc' // default sort is ascending names
     });
     const [doSearch, setDoSearch] = useState<boolean>(true);
-    const [showModal, setShowModal] = useState<boolean>(false);
+    const [showRedirectModal, setShowRedirectModal] = useState<boolean>(false);
+    const [showMatchModal, setShowMatchModal] = useState<boolean>(false);
     const [currentPage, setCurrentPage] = useState<number>(1);
-
-    const navigate = useNavigate();
 
     /** Section: API Calls */
     const loadDogsCallback = useCallback(async() => {
@@ -47,7 +46,7 @@ export function Browse(props: IBrowsePageProps) {
             setDogs(dogs);
             setDoSearch(false);
         } catch (err) {
-            setShowModal(true);
+            setShowRedirectModal(true);
         }
     }, [doSearch, queryParams]);
 
@@ -61,8 +60,9 @@ export function Browse(props: IBrowsePageProps) {
 
     async function loadMatch() {
         try {
-            const newMatch = await loadMatchHelper(favorites);
-            setMatch(newMatch);
+            const match: Match = await getMatch(favorites);
+            setMatchID(match.match);
+            setShowMatchModal(true);
         } catch (err) {
 
         }
@@ -123,15 +123,15 @@ export function Browse(props: IBrowsePageProps) {
         loadMatch();
     }
 
-    function closeModal() {
-        setShowModal(false);
-        navigate('/login');
+    function closeMatchModal() {
+        setShowMatchModal(false);
     }
 
     return (
         <div className='browse'>
 
-            <RedirectModal showModal={showModal} closeModal={closeModal} />
+            <RedirectModal showRedirectModal={showRedirectModal} />
+            <MatchModal matchID={matchID} showMatchModal={showMatchModal} closeMatchModal={closeMatchModal} />
 
             <div className='optionsBar'>
                 <Button onClick={handleSearchClick} variant='primary'>Search</Button>
@@ -142,10 +142,6 @@ export function Browse(props: IBrowsePageProps) {
             </div>
 
             <div className='dogCards'>
-                 {match ?
-                    <DogCard dog={match} toggleFavorite={toggleFavorite} isFavorite={true} />
-                : null
-                }
                 {dogs.map((dog, index) => {
                     const isFavorite = favorites.indexOf(dog.id) > -1 ? true : false;
                     if (locations[dog.zip_code]) {
@@ -161,27 +157,5 @@ export function Browse(props: IBrowsePageProps) {
 
             <Pagination itemsCount={searchResults.total} itemsPerPage={queryParams.size} currentPage={currentPage} setCurrentPage={setCurrentPage} />
         </div>
-    );
-}
-
-interface IRedirectModalProps {
-    showModal: boolean,
-    closeModal: () => void
-}
-
-function RedirectModal({showModal, closeModal}: IRedirectModalProps) {
-    return (
-        <Modal show={showModal} onClose={closeModal} bg='light' delay={3000} autohide>
-            <Modal.Header closeButton>
-                <strong className='me-auto'>You have been signed out.</strong>
-            </Modal.Header>
-            <Modal.Body>
-                Please log in again.
-            </Modal.Body>
-            <Modal.Footer>
-                {/* <Button variant='secondary'>Go Home</Button> */}
-                <Button variant='primary' onClick={closeModal}>Log in</Button>
-            </Modal.Footer>
-        </Modal>
     );
 }
